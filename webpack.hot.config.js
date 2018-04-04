@@ -3,9 +3,9 @@ const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
-    entry: './src/main.js',
+    entry: './hot/index.js',
     // entry:{
-    //  pageA: "./hot/pageA",
+    //     pageA: "./hot/pageA",
 	// 	pageB: "./hot/pageB",
 	// 	pageC: "./hot/pageC"
     // },
@@ -35,12 +35,31 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(path.resolve(__dirname, 'dist')),
         new HtmlWebpackPlugin({
-            template: './src/reactHtml.html',
+            template: './hot/index.html',
             filename: 'index.html'
         }),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin()//用户名替代id
     ],
+    optimization: {
+		splitChunks: {
+			cacheGroups: {
+				commons: {
+					chunks: "initial",
+					minChunks: 2,
+					maxInitialRequests: 5, // The default limit is too small to showcase the effect
+					minSize: 0 // This is example is too small to create commons chunks
+				},
+				vendor: {
+					test: /node_modules/,
+					chunks: "initial",
+					name: "vendor",
+					priority: 10,
+					enforce: true
+				}
+			}
+		}
+	},
     devServer: {//配置此静态文件服务器，可以用来预览打包后项目
         inline:true,//打包后加入一个websocket客户端
         hot:true,//热加载
